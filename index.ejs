@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Review Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Administrative Panel</h2>
+                <h5 class="text-primary">Desk Scope: <strong><%= adminUnit %></strong></h5>
+            </div>
+            <a href="/logout" class="btn btn-danger">Sign Out</a>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h4 class="mb-3">Pending Action List for Students</h4>
+                <% if(students.length === 0) { %>
+                    <p class="text-muted">No students have signed up or applied under your department tracking parameters yet.</p>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Student Matric Number</th>
+                                    <th>Current State (Your Scope)</th>
+                                    <th>Administrative Action Control</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% students.forEach(student => { %>
+                                    <% 
+                                       // Determine local status inside specific scope
+                                       let localStatus = (adminUnit.length <= 3) ? student.clearances['Department'] : student.clearances[adminUnit];
+                                    %>
+                                    <tr>
+                                        <td><strong><%= student.matric %></strong></td>
+                                        <td>
+                                            <span class="badge <%= localStatus==='Cleared'?'bg-success': localStatus==='Rejected'?'bg-danger':'bg-warning text-dark' %>">
+                                                <%= localStatus %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form action="/admin/clear-student" method="POST" class="d-inline-flex gap-2">
+                                                <input type="hidden" name="studentMatric" value="<%= student.matric %>">
+                                                <button type="submit" name="status" value="Cleared" class="btn btn-sm btn-success">Grant Approval</button>
+                                                <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-danger">Issue Denial</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
